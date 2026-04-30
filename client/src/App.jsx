@@ -21,7 +21,6 @@ import {
   MapPinned,
   Menu,
   MessageCircle,
-  Phone,
   Plane,
   PlusCircle,
   ReceiptText,
@@ -39,7 +38,7 @@ import {
   Users,
   UtensilsCrossed
 } from "lucide-react";
-import { fetchTour, createBooking, createInquiry } from "./lib/api.js";
+import { fetchTour, createBooking } from "./lib/api.js";
 import { ImageAsset } from "./components/ImageAsset.jsx";
 import { Accordion } from "./components/Accordion.jsx";
 
@@ -86,7 +85,7 @@ const footerColumns = [
       "Privacy Policy",
       "Cookies and Marketing Preferences",
       "Internal Issue and Co-Workers",
-      "International working in the United States and the E.U.",
+      "Intervention something in the United States and the E.U.",
       "Do not Sell or Share My Personal Information"
     ]
   },
@@ -138,6 +137,22 @@ function DetailCard({ item }) {
         <p>{item.subtitle}</p>
       </div>
     </article>
+  );
+}
+
+function SupportActionCard({ onInstantQuery }) {
+  return (
+    <div className="side-support-card">
+      <p className="side-support-card__title">Plan your adventure:</p>
+      <button type="button" className="support-link">
+        <Download size={16} />
+        <span className="support-link__label">Download PDF Brochure</span>
+      </button>
+      <button type="button" className="support-link" onClick={onInstantQuery}>
+        <CircleHelp size={18} />
+        <span className="support-link__label">Instant Query</span>
+      </button>
+    </div>
   );
 }
 
@@ -265,9 +280,7 @@ function App() {
   const [reviewSearch, setReviewSearch] = useState("");
   const [showAllDates, setShowAllDates] = useState(false);
   const [showBookingForm, setShowBookingForm] = useState(false);
-  const [showInquiryForm, setShowInquiryForm] = useState(false);
   const [bookingStatus, setBookingStatus] = useState("");
-  const [inquiryStatus, setInquiryStatus] = useState("");
   const [bookingForm, setBookingForm] = useState({
     packageType: "Standard Package",
     tourType: "Group Tour",
@@ -277,13 +290,7 @@ function App() {
     email: "",
     notes: ""
   });
-  const [inquiryForm, setInquiryForm] = useState({
-    name: "",
-    email: "",
-    message: ""
-  });
   const galleryRef = useRef(null);
-  const relatedRef = useRef(null);
 
   useEffect(() => {
     const loadTour = async () => {
@@ -362,10 +369,6 @@ function App() {
     galleryRef.current?.scrollBy({ left: direction * 280, behavior: "smooth" });
   };
 
-  const scrollRelated = (direction) => {
-    relatedRef.current?.scrollBy({ left: direction * 320, behavior: "smooth" });
-  };
-
   const handleBookingSubmit = async (event) => {
     event.preventDefault();
     setBookingStatus("Submitting booking...");
@@ -384,26 +387,6 @@ function App() {
       }));
     } catch (submitError) {
       setBookingStatus(submitError.message);
-    }
-  };
-
-  const handleInquirySubmit = async (event) => {
-    event.preventDefault();
-    setInquiryStatus("Sending inquiry...");
-
-    try {
-      await createInquiry({
-        tourSlug: tour.slug,
-        ...inquiryForm
-      });
-      setInquiryStatus("Inquiry sent successfully.");
-      setInquiryForm({
-        name: "",
-        email: "",
-        message: ""
-      });
-    } catch (submitError) {
-      setInquiryStatus(submitError.message);
     }
   };
 
@@ -441,10 +424,12 @@ function App() {
       <header className="hero-shell">
         <div className="hero-topline">
           <div className="hero-topline__right">
-            <span>FAQs</span>
-            <span>Brochures</span>
-            <span>Contact Us</span>
-            <span>EUR | BDT</span>
+            <a href="#!">FAQs</a>
+            <a href="#!">BROCHURE</a>
+            <a href="#!">CONTACT US</a>
+            <button type="button" className="quote-button">
+              GET A QUOTE
+            </button>
           </div>
         </div>
 
@@ -537,307 +522,142 @@ function App() {
                 </p>
               ))}
             </section>
-          </section>
 
-          <aside className="sidebar-column">
-            <div className="booking-panel">
-              <div className="panel-actions">
-                <button type="button">
-                  <Heart size={16} />
-                  Add to wishlist
-                </button>
-                <button type="button">
-                  <Share2 size={16} />
-                  Share
-                </button>
-              </div>
-
-              <div className="panel-block">
-                <label>Select your inclusion type</label>
-                <div className="option-stack">
-                  {content.bookingPanel.packageTypes.map((item) => (
-                    <button
-                      type="button"
-                      key={item}
-                      className={`choice-button ${bookingForm.packageType === item ? "is-active" : ""}`}
-                      onClick={() =>
-                        setBookingForm((current) => ({ ...current, packageType: item }))
-                      }
-                    >
-                      <span className="choice-dot" />
-                      {item}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="panel-block">
-                <label>Select your tour type</label>
-                <div className="tour-type-toggle">
-                  {content.bookingPanel.tourTypes.map((item) => (
-                    <button
-                      type="button"
-                      key={item}
-                      className={bookingForm.tourType === item ? "is-active" : ""}
-                      onClick={() =>
-                        setBookingForm((current) => ({ ...current, tourType: item }))
-                      }
-                    >
-                      {item.toLowerCase().includes("group") ? (
-                        <Users size={17} />
-                      ) : (
-                        <SlidersHorizontal size={17} />
-                      )}
-                      {item}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="price-box">
-                <div className="price-box__top">
-                  <span>From {content.bookingPanel.priceBefore}</span>
-                  <span className="discount-badge">{content.bookingPanel.savings}</span>
-                </div>
-                <div className="price-box__amount">
-                  <span>US</span>
-                  <strong>{content.bookingPanel.priceNow}</strong>
-                  <span>per person</span>
-                </div>
-                <p>Price based on Private Double Room</p>
-              </div>
-
-              <div className="select-stack">
-                <label>
-                  <CalendarDays size={16} />
-                  <select
-                    value={bookingForm.travelMonth}
-                    onChange={(event) =>
-                      setBookingForm((current) => ({ ...current, travelMonth: event.target.value }))
-                    }
+            <div className="full-width-content">
+              <div className="section-tab-row">
+                {sectionLinks.map((link) => (
+                  <button
+                    type="button"
+                    key={link.id}
+                    className={`section-tab ${activeSection === link.id ? "is-active" : ""}`}
+                    onClick={() => scrollToSection(link.id)}
                   >
-                    {content.bookingPanel.months.map((item) => (
-                      <option key={item}>{item}</option>
-                    ))}
-                  </select>
-                </label>
-
-                <label>
-                  <Users size={16} />
-                  <select
-                    value={bookingForm.travelers}
-                    onChange={(event) =>
-                      setBookingForm((current) => ({ ...current, travelers: event.target.value }))
-                    }
-                  >
-                    {content.bookingPanel.travelers.map((item) => (
-                      <option key={item}>{item}</option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-
-              <div className="primary-actions">
-                <button
-                  type="button"
-                  className="primary-book-button"
-                  onClick={() => setShowBookingForm((current) => !current)}
-                >
-                  Book this Tour
-                </button>
-                <button type="button" className="wishlist-circle" aria-label="Add to favorites">
-                  <Heart size={17} />
-                </button>
-              </div>
-
-              {showBookingForm ? (
-                <form className="sidebar-form" onSubmit={handleBookingSubmit}>
-                  <input
-                    type="text"
-                    placeholder="Guest name"
-                    value={bookingForm.guestName}
-                    onChange={(event) =>
-                      setBookingForm((current) => ({ ...current, guestName: event.target.value }))
-                    }
-                    required
-                  />
-                  <input
-                    type="email"
-                    placeholder="Email address"
-                    value={bookingForm.email}
-                    onChange={(event) =>
-                      setBookingForm((current) => ({ ...current, email: event.target.value }))
-                    }
-                    required
-                  />
-                  <textarea
-                    placeholder="Booking notes"
-                    value={bookingForm.notes}
-                    onChange={(event) =>
-                      setBookingForm((current) => ({ ...current, notes: event.target.value }))
-                    }
-                  />
-                  <button type="submit" className="secondary-submit">
-                    Submit Booking
+                    {link.label}
                   </button>
-                  {bookingStatus ? <p className="form-status">{bookingStatus}</p> : null}
-                </form>
-              ) : null}
-
-              <p className="price-guarantee">
-                <BadgeCheck size={16} />
-                Best price guarantee <a href="#!">Learn More</a>
-              </p>
-            </div>
-
-            <div className="side-support-card">
-              <p>Plan your adventure:</p>
-              <button type="button">
-                <Download size={16} />
-                <span>Download PDF Brochure</span>
-              </button>
-              <button type="button" onClick={() => scrollToSection("contact-operator")}>
-                <CircleHelp size={18} />
-                <span>Instant Query</span>
-              </button>
-            </div>
-          </aside>
-
-          <div className="full-width-content">
-            <div className="section-tab-row">
-              {sectionLinks.map((link) => (
-                <button
-                  type="button"
-                  key={link.id}
-                  className={`section-tab ${activeSection === link.id ? "is-active" : ""}`}
-                  onClick={() => scrollToSection(link.id)}
-                >
-                  {link.label}
-                </button>
-              ))}
-            </div>
-
-            <section id="highlights" className="content-section">
-              <div className="section-heading">
-                <h2>Tour Highlights</h2>
-              </div>
-              <ul className="bullet-list">
-                {content.highlights.map((highlight) => (
-                  <li key={highlight}>{highlight}</li>
                 ))}
-              </ul>
-            </section>
-
-            <section id="itinerary" className="content-section">
-              <div className="section-heading">
-                <h2>Itinerary</h2>
               </div>
 
-              <div className="itinerary-frame">
-                <div className="route-strip">
-                  <div className="route-point">
-                    <MapPinned size={18} />
-                    <div>
-                      <strong>Start Point</strong>
-                      <span>{content.itinerary.startPoint}</span>
-                    </div>
-                  </div>
-                  <div className="route-point">
-                    <MapPinned size={18} />
-                    <div>
-                      <strong>End Point</strong>
-                      <span>{content.itinerary.endPoint}</span>
-                    </div>
-                  </div>
+              <section id="highlights" className="content-section">
+                <div className="section-heading">
+                  <h2>Tour Highlights</h2>
+                </div>
+                <ul className="bullet-list">
+                  {content.highlights.map((highlight) => (
+                    <li key={highlight}>{highlight}</li>
+                  ))}
+                </ul>
+              </section>
+
+              <section id="itinerary" className="content-section">
+                <div className="section-heading">
+                  <h2>Itinerary</h2>
                 </div>
 
-                <ImageAsset
-                  src={content.itinerary.mapImage}
-                  label={content.itinerary.mapLabel}
-                  alt="Itinerary map"
-                  className="map-image"
-                  overlay
-                />
-
-                <div className="itinerary-map-card">
-                  <div className="itinerary-card-header">
-                    <h3>Itinerary &amp; Map</h3>
-                    <button type="button">View Full Itinerary</button>
+                <div className="itinerary-frame">
+                  <div className="route-strip">
+                    <div className="route-point">
+                      <MapPinned size={18} />
+                      <div>
+                        <strong>Start Point</strong>
+                        <span>{content.itinerary.startPoint}</span>
+                      </div>
+                    </div>
+                    <div className="route-point">
+                      <MapPinned size={18} />
+                      <div>
+                        <strong>End Point</strong>
+                        <span>{content.itinerary.endPoint}</span>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="day-pill-list">
-                    {content.itinerary.days.map((day, index) => (
-                      <ItineraryDayRow
-                        key={day.day}
-                        day={day}
-                        isActive={activeDay === index}
-                        onClick={() => setActiveDay(index)}
-                      />
-                    ))}
-                  </div>
+                  <ImageAsset
+                    src={content.itinerary.mapImage}
+                    label={content.itinerary.mapLabel}
+                    alt="Itinerary map"
+                    className="map-image"
+                    overlay
+                  />
 
-                  <div className="itinerary-day-detail">
-                    <div className="itinerary-steps">
-                      {activeItineraryDay.steps.map((step, index) => (
-                        <div className="itinerary-step" key={`${activeItineraryDay.day}-${index}`}>
-                          <div className="step-marker">{index + 1}</div>
-                          <p>{step}</p>
-                        </div>
+                  <div className="itinerary-map-card">
+                    <div className="itinerary-card-header">
+                      <h3>Itinerary &amp; Map</h3>
+                      <button type="button">View Full Itinerary</button>
+                    </div>
+
+                    <div className="day-pill-list">
+                      {content.itinerary.days.map((day, index) => (
+                        <ItineraryDayRow
+                          key={day.day}
+                          day={day}
+                          isActive={activeDay === index}
+                          onClick={() => setActiveDay(index)}
+                        />
                       ))}
                     </div>
 
-                    <ImageAsset
-                      src={itineraryPreviewImage.image}
-                      label={itineraryPreviewImage.imageLabel}
-                      alt="Itinerary preview"
-                      className="itinerary-image"
-                      overlay
-                    />
+                    <div className="itinerary-day-detail">
+                      <div className="itinerary-steps">
+                        {activeItineraryDay.steps.map((step, index) => (
+                          <div className="itinerary-step" key={`${activeItineraryDay.day}-${index}`}>
+                            <div className="step-marker">{index + 1}</div>
+                            <p>{step}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <ImageAsset
+                        src={itineraryPreviewImage.image}
+                        label={itineraryPreviewImage.imageLabel}
+                        alt="Itinerary preview"
+                        className="itinerary-image"
+                        overlay
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </section>
+              </section>
 
-            <section id="inclusions" className="content-section">
-              <div className="section-heading section-heading--split">
-                <h2>What&apos;s Included</h2>
-                <button
-                  type="button"
-                  className="link-style-button"
-                  onClick={() =>
-                    setIncludedOpenIndexes((current) =>
-                      current.length === includedItems.length
-                        ? []
-                        : includedItems.map((_, index) => index)
-                    )
+              <section id="inclusions" className="content-section">
+                <div className="section-heading section-heading--split">
+                  <h2>What&apos;s Included</h2>
+                  <button
+                    type="button"
+                    className="link-style-button"
+                    onClick={() =>
+                      setIncludedOpenIndexes((current) =>
+                        current.length === includedItems.length
+                          ? []
+                          : includedItems.map((_, index) => index)
+                      )
+                    }
+                  >
+                    {includedOpenIndexes.length === includedItems.length ? "Collapse All" : "Expand All"}
+                  </button>
+                </div>
+
+                <Accordion
+                  items={includedItems}
+                  openIndexes={includedOpenIndexes}
+                  onToggle={(index) =>
+                    setIncludedOpenIndexes((current) => toggleIndex(current, index))
                   }
-                >
-                  {includedOpenIndexes.length === includedItems.length ? "Collapse All" : "Expand All"}
-                </button>
-              </div>
+                  compact
+                />
 
-              <Accordion
-                items={includedItems}
-                openIndexes={includedOpenIndexes}
-                onToggle={(index) =>
-                  setIncludedOpenIndexes((current) => toggleIndex(current, index))
-                }
-                compact
-              />
+                <div className="subsection-heading">What&apos;s Not Included</div>
 
-              <div className="subsection-heading">What&apos;s Not Included</div>
+                <Accordion
+                  items={excludedItems}
+                  openIndexes={excludedOpenIndexes}
+                  onToggle={(index) =>
+                    setExcludedOpenIndexes((current) => toggleIndex(current, index))
+                  }
+                  compact
+                />
+              </section>
 
-              <Accordion
-                items={excludedItems}
-                openIndexes={excludedOpenIndexes}
-                onToggle={(index) =>
-                  setExcludedOpenIndexes((current) => toggleIndex(current, index))
-                }
-                compact
-              />
-            </section>
-
-            <section className="content-section">
+              <section className="content-section">
               <div className="section-heading">
                 <h2>Additional Info</h2>
               </div>
@@ -876,9 +696,9 @@ function App() {
                   Explore your options
                 </button>
               </div>
-            </section>
+              </section>
 
-            <section id="gallery" className="content-section">
+              <section id="gallery" className="content-section">
               <div className="section-heading section-heading--split">
                 <h2>Traveler Moments</h2>
                 <div className="scroller-controls">
@@ -903,9 +723,9 @@ function App() {
                   />
                 ))}
               </div>
-            </section>
+              </section>
 
-            <section id="reviews" className="content-section">
+              <section id="reviews" className="content-section">
               <div className="section-heading">
                 <h2>Traveler Reviews</h2>
               </div>
@@ -987,9 +807,9 @@ function App() {
                   Check Availability
                 </button>
               </div>
-            </section>
+              </section>
 
-            <section id="dates" className="content-section">
+              <section id="dates" className="content-section">
               <div className="section-heading">
                 <h2>Dates &amp; Availability</h2>
               </div>
@@ -1015,9 +835,9 @@ function App() {
               >
                 {showAllDates ? "Show Fewer Upcoming Dates" : "Show More Upcoming Dates"}
               </button>
-            </section>
+              </section>
 
-            <section id="faq" className="content-section">
+              <section id="faq" className="content-section">
               <div className="section-heading">
                 <h2>FAQs</h2>
               </div>
@@ -1064,47 +884,13 @@ function App() {
                 <button
                   type="button"
                   className="contact-operator-button"
-                  onClick={() => setShowInquiryForm((current) => !current)}
                 >
                   Contact Operator
                 </button>
-
-                {showInquiryForm ? (
-                  <form className="contact-form" onSubmit={handleInquirySubmit}>
-                    <input
-                      type="text"
-                      placeholder="Your name"
-                      value={inquiryForm.name}
-                      onChange={(event) =>
-                        setInquiryForm((current) => ({ ...current, name: event.target.value }))
-                      }
-                      required
-                    />
-                    <input
-                      type="email"
-                      placeholder="Email address"
-                      value={inquiryForm.email}
-                      onChange={(event) =>
-                        setInquiryForm((current) => ({ ...current, email: event.target.value }))
-                      }
-                      required
-                    />
-                    <textarea
-                      placeholder="Tell us what you need"
-                      value={inquiryForm.message}
-                      onChange={(event) =>
-                        setInquiryForm((current) => ({ ...current, message: event.target.value }))
-                      }
-                      required
-                    />
-                    <button type="submit">Send Inquiry</button>
-                    {inquiryStatus ? <p className="form-status">{inquiryStatus}</p> : null}
-                  </form>
-                ) : null}
               </div>
-            </section>
+              </section>
 
-            <section className="content-section">
+              <section className="content-section">
               <div className="section-heading">
                 <h2>Good to Know</h2>
               </div>
@@ -1125,86 +911,265 @@ function App() {
               <button type="button" className="show-more-button show-more-button--left">
                 Show more FAQs
               </button>
-            </section>
+              </section>
 
-            <section className="content-section">
-              <div className="section-heading">
-                <h2>Similar tour like this</h2>
-              </div>
-              <p className="section-subcopy">Find your dream tour.</p>
+            </div>
+          </section>
 
-              <div className="search-suggestions">
-                <strong>PEOPLE ALSO SEARCH FOR</strong>
-                <div className="tag-grid">
-                  {content.searchTags.map((tag) => (
-                    <span key={tag}>{tag}</span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="section-heading section-heading--split">
-                <span />
-                <div className="scroller-controls">
-                  <button type="button" onClick={() => scrollRelated(-1)} aria-label="Previous related tours">
-                    <ChevronLeft size={18} />
+          <aside className="sidebar-column">
+            <div className="sidebar-stack">
+              <div className="booking-panel">
+                <div className="panel-actions">
+                  <button type="button">
+                    <Heart size={16} />
+                    Add to wishlist
                   </button>
-                  <button type="button" onClick={() => scrollRelated(1)} aria-label="Next related tours">
-                    <ChevronRight size={18} />
+                  <button type="button">
+                    <Share2 size={16} />
+                    Share
                   </button>
                 </div>
-              </div>
 
-              <div className="related-tour-row" ref={relatedRef}>
-                {content.relatedTours.map((item, index) => (
-                  <article className="related-tour-card" key={`${item.title}-${index}`}>
-                    <ImageAsset
-                      src={item.image}
-                      label={item.imageLabel}
-                      alt={item.title}
-                      className="related-tour-image"
-                      overlay
+                <div className="panel-block">
+                  <label>Select your inclusion type</label>
+                  <div className="option-stack">
+                    {content.bookingPanel.packageTypes.map((item) => (
+                      <button
+                        type="button"
+                        key={item}
+                        className={`choice-button ${bookingForm.packageType === item ? "is-active" : ""}`}
+                        onClick={() =>
+                          setBookingForm((current) => ({ ...current, packageType: item }))
+                        }
+                      >
+                        <span className="choice-dot" />
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="panel-block">
+                  <label>Select your tour type</label>
+                  <div className="tour-type-toggle">
+                    {content.bookingPanel.tourTypes.map((item) => (
+                      <button
+                        type="button"
+                        key={item}
+                        className={bookingForm.tourType === item ? "is-active" : ""}
+                        onClick={() =>
+                          setBookingForm((current) => ({ ...current, tourType: item }))
+                        }
+                      >
+                        {item.toLowerCase().includes("group") ? (
+                          <Users size={17} />
+                        ) : (
+                          <SlidersHorizontal size={17} />
+                        )}
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="price-box">
+                  <div className="price-box__top">
+                    <span>From {content.bookingPanel.priceBefore}</span>
+                    <span className="discount-badge">{content.bookingPanel.savings}</span>
+                  </div>
+                  <div className="price-box__amount">
+                    <span>US</span>
+                    <strong>{content.bookingPanel.priceNow}</strong>
+                    <span>per person</span>
+                  </div>
+                  <p>Price based on Private Double Room</p>
+                </div>
+
+                <div className="select-stack">
+                  <label>
+                    <CalendarDays size={16} />
+                    <select
+                      value={bookingForm.travelMonth}
+                      onChange={(event) =>
+                        setBookingForm((current) => ({ ...current, travelMonth: event.target.value }))
+                      }
+                    >
+                      {content.bookingPanel.months.map((item) => (
+                        <option key={item}>{item}</option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label>
+                    <Users size={16} />
+                    <select
+                      value={bookingForm.travelers}
+                      onChange={(event) =>
+                        setBookingForm((current) => ({ ...current, travelers: event.target.value }))
+                      }
+                    >
+                      {content.bookingPanel.travelers.map((item) => (
+                        <option key={item}>{item}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+
+                <div className="primary-actions">
+                  <button
+                    type="button"
+                    className="primary-book-button"
+                    onClick={() => setShowBookingForm((current) => !current)}
+                  >
+                    Book this Tour
+                  </button>
+                  <button type="button" className="wishlist-circle" aria-label="Add to favorites">
+                    <Heart size={17} />
+                  </button>
+                </div>
+
+                {showBookingForm ? (
+                  <form className="sidebar-form" onSubmit={handleBookingSubmit}>
+                    <input
+                      type="text"
+                      placeholder="Guest name"
+                      value={bookingForm.guestName}
+                      onChange={(event) =>
+                        setBookingForm((current) => ({ ...current, guestName: event.target.value }))
+                      }
+                      required
                     />
+                    <input
+                      type="email"
+                      placeholder="Email address"
+                      value={bookingForm.email}
+                      onChange={(event) =>
+                        setBookingForm((current) => ({ ...current, email: event.target.value }))
+                      }
+                      required
+                    />
+                    <textarea
+                      placeholder="Booking notes"
+                      value={bookingForm.notes}
+                      onChange={(event) =>
+                        setBookingForm((current) => ({ ...current, notes: event.target.value }))
+                      }
+                    />
+                    <button type="submit" className="secondary-submit">
+                      Submit Booking
+                    </button>
+                    {bookingStatus ? <p className="form-status">{bookingStatus}</p> : null}
+                  </form>
+                ) : null}
 
-                    <div className="related-tour-body">
-                      <h3>{item.title}</h3>
-                      <div className="related-tour-footer">
-                        <span>
-                          FROM <strong>{item.price}</strong>
-                        </span>
-                        <button type="button">Book</button>
-                      </div>
-                    </div>
-                  </article>
+                <p className="price-guarantee">
+                  <BadgeCheck size={16} />
+                  Best price guarantee <a href="#!">Learn More</a>
+                </p>
+              </div>
+
+            <SupportActionCard
+              onInstantQuery={() => {
+                  scrollToSection("contact-operator");
+              }}
+            />
+            </div>
+          </aside>
+
+          <section className="content-section similar-tours-section">
+            <div className="section-heading">
+              <h2>Similar tour like this</h2>
+            </div>
+            <p className="section-subcopy">Find your dream tour.</p>
+
+            <div className="search-suggestions">
+              <strong>PEOPLE ALSO SEARCH FOR</strong>
+              <div className="tag-grid">
+                {content.searchTags.map((tag) => (
+                  <span key={tag}>
+                    <Search size={12} />
+                    {tag}
+                  </span>
                 ))}
               </div>
-            </section>
-          </div>
+            </div>
+
+            <div className="related-tour-row">
+              {content.relatedTours.map((item, index) => (
+                <article className="related-tour-card" key={`${item.title}-${index}`}>
+                  <ImageAsset
+                    src={item.image}
+                    label={item.imageLabel}
+                    alt={item.title}
+                    className="related-tour-image"
+                    overlay
+                  />
+
+                  <div className="related-tour-body">
+                    <h3>{item.title}</h3>
+                    <div className="related-tour-footer">
+                      <span>
+                        FROM <strong>{item.price}</strong>
+                      </span>
+                      <button type="button">Book</button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
         </div>
       </main>
 
       <footer className="site-footer">
         <div className="footer-grid">
           <div className="footer-locale">
-            <h4>Language</h4>
-            <div className="footer-select">English (United States)</div>
-            <h4>Currency</h4>
-            <div className="footer-select">U.S. Dollar ($)</div>
+            <div className="footer-group">
+              <h4>Language</h4>
+              <div className="footer-select">
+                <span>English (United States)</span>
+                <span className="footer-select__icon">↗</span>
+              </div>
+            </div>
+            <div className="footer-group">
+              <h4>Currency</h4>
+              <div className="footer-select">
+                <span>U.S. Dollar ($)</span>
+                <span className="footer-select__icon">↗</span>
+              </div>
+            </div>
           </div>
 
           <div className="footer-mobile">
             <h4>Mobile</h4>
-            <div className="store-badge">Get it on Google Play</div>
-            <div className="store-badge">Download on the App Store</div>
+            <div className="footer-store-list">
+              <div className="store-badge">
+                <span className="store-badge__icon store-badge__icon--play" />
+                <span className="store-badge__copy">
+                  <small>GET IT ON</small>
+                  <strong>Google Play</strong>
+                </span>
+              </div>
+              <div className="store-badge">
+                <span className="store-badge__icon store-badge__icon--apple" />
+                <span className="store-badge__copy">
+                  <small>Download on the</small>
+                  <strong>App Store</strong>
+                </span>
+              </div>
+            </div>
           </div>
 
           {footerColumns.map((column) => (
-            <div key={column.title}>
+            <div className="footer-column" key={column.title}>
               <h4>{column.title}</h4>
-              {column.links.map((link) => (
-                <a href="#!" key={link}>
-                  {link}
-                </a>
-              ))}
+              <div className="footer-link-list">
+                {column.links.map((link) => (
+                  <a href="#!" key={link}>
+                    {link}
+                  </a>
+                ))}
+              </div>
               {column.title === "Work With Us" ? (
                 <div className="payment-row">
                   <span>VISA</span>
@@ -1218,11 +1183,12 @@ function App() {
         </div>
 
         <div className="footer-bottom">
-          <p>&copy; 2005 - 2025 LastDayTrip Media in Zurich &amp; Berlin.</p>
+          <p>&copy; 2006 - 2025 LastDayTrip Media in Zurich &amp; Berlin.</p>
           <div className="footer-socials">
             <span>f</span>
-            <span>o</span>
+            <span>◎</span>
             <span>x</span>
+            <span>•</span>
             <span>in</span>
           </div>
         </div>
