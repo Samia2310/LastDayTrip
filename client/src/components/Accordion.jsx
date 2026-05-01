@@ -14,7 +14,7 @@ export function Accordion({
         const isOpen = Array.isArray(openIndexes)
           ? openIndexes.includes(index)
           : openIndex === index;
-        const content = item.content || item.answer;
+        const content = item.content ?? item.answer ?? item.description;
 
         return (
           <div className={`accordion-item ${isOpen ? "is-open" : ""}`} key={`${item.title || item.question}-${index}`}>
@@ -27,7 +27,7 @@ export function Accordion({
                 {item.leading ? <div className="accordion-leading">{item.leading}</div> : null}
                 <div>
                   <div className="accordion-title">{item.title || item.question}</div>
-                  {item.description ? (
+                  {!compact && item.description ? (
                     <div className="accordion-description">{item.description}</div>
                   ) : null}
                 </div>

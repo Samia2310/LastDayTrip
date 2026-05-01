@@ -15,12 +15,13 @@ import {
   Clock3,
   CloudSun,
   Download,
+  Flag,
   Heart,
   ImageIcon,
   Languages,
+  MapPin,
   MapPinned,
   Menu,
-  MessageCircle,
   Plane,
   PlusCircle,
   ReceiptText,
@@ -32,6 +33,7 @@ import {
   Smartphone,
   Stamp,
   Star,
+  ThumbsDown,
   ThumbsUp,
   Tickets,
   UserRound,
@@ -189,8 +191,8 @@ function ReviewCard({ review }) {
         <button type="button" aria-label="Like review">
           <ThumbsUp size={15} />
         </button>
-        <button type="button" aria-label="Reply to review">
-          <MessageCircle size={15} />
+        <button type="button" aria-label="Dislike review">
+          <ThumbsDown size={15} />
         </button>
       </div>
     </article>
@@ -549,21 +551,21 @@ function App() {
               </section>
 
               <section id="itinerary" className="content-section">
-                <div className="section-heading">
+                <div className="section-heading section-heading--itinerary">
                   <h2>Itinerary</h2>
                 </div>
 
                 <div className="itinerary-frame">
                   <div className="route-strip">
                     <div className="route-point">
-                      <MapPinned size={18} />
+                      <MapPin className="route-icon route-icon--start" size={18} />
                       <div>
                         <strong>Start Point</strong>
                         <span>{content.itinerary.startPoint}</span>
                       </div>
                     </div>
-                    <div className="route-point">
-                      <MapPinned size={18} />
+                    <div className="route-point route-point--end">
+                      <Flag className="route-icon route-icon--end" size={18} />
                       <div>
                         <strong>End Point</strong>
                         <span>{content.itinerary.endPoint}</span>
@@ -619,7 +621,7 @@ function App() {
               </section>
 
               <section id="inclusions" className="content-section">
-                <div className="section-heading section-heading--split">
+                <div className="section-heading section-heading--split section-heading--full-underline">
                   <h2>What&apos;s Included</h2>
                   <button
                     type="button"
@@ -658,7 +660,7 @@ function App() {
               </section>
 
               <section className="content-section">
-              <div className="section-heading">
+              <div className="section-heading section-heading--no-underline">
                 <h2>Additional Info</h2>
               </div>
 
@@ -699,7 +701,7 @@ function App() {
               </section>
 
               <section id="gallery" className="content-section">
-              <div className="section-heading section-heading--split">
+              <div className="section-heading section-heading--split section-heading--no-underline">
                 <h2>Traveler Moments</h2>
                 <div className="scroller-controls">
                   <button type="button" onClick={() => scrollGallery(-1)} aria-label="Previous images">
@@ -726,7 +728,7 @@ function App() {
               </section>
 
               <section id="reviews" className="content-section">
-              <div className="section-heading">
+              <div className="section-heading section-heading--no-underline">
                 <h2>Traveler Reviews</h2>
               </div>
 
@@ -780,37 +782,10 @@ function App() {
                 </button>
               </div>
 
-              <div className="review-cta">
-                <select
-                  value={bookingForm.travelMonth}
-                  onChange={(event) =>
-                    setBookingForm((current) => ({ ...current, travelMonth: event.target.value }))
-                  }
-                >
-                  {content.bookingPanel.months.map((month) => (
-                    <option key={month}>{month}</option>
-                  ))}
-                </select>
-
-                <select
-                  value={bookingForm.travelers}
-                  onChange={(event) =>
-                    setBookingForm((current) => ({ ...current, travelers: event.target.value }))
-                  }
-                >
-                  {content.bookingPanel.travelers.map((traveler) => (
-                    <option key={traveler}>{traveler}</option>
-                  ))}
-                </select>
-
-                <button type="button" onClick={() => scrollToSection("dates")}>
-                  Check Availability
-                </button>
-              </div>
               </section>
 
               <section id="dates" className="content-section">
-              <div className="section-heading">
+              <div className="section-heading section-heading--no-underline">
                 <h2>Dates &amp; Availability</h2>
               </div>
 
@@ -838,7 +813,7 @@ function App() {
               </section>
 
               <section id="faq" className="content-section">
-              <div className="section-heading">
+              <div className="section-heading section-heading--no-underline">
                 <h2>FAQs</h2>
               </div>
               <p className="section-subcopy">What our customer ask about this tours?</p>
@@ -891,7 +866,7 @@ function App() {
               </section>
 
               <section className="content-section">
-              <div className="section-heading">
+              <div className="section-heading section-heading--no-underline">
                 <h2>Good to Know</h2>
               </div>
               <p className="section-subcopy">Tour ID: 20418</p>
@@ -1077,7 +1052,7 @@ function App() {
           </aside>
 
           <section className="content-section similar-tours-section">
-            <div className="section-heading">
+            <div className="section-heading section-heading--full-underline">
               <h2>Similar tour like this</h2>
             </div>
             <p className="section-subcopy">Find your dream tour.</p>
