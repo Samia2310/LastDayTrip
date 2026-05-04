@@ -1,6 +1,24 @@
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  (import.meta.env.PROD ? "/api" : "http://localhost:5000/api");
+const DEFAULT_API_BASE_URL = import.meta.env.PROD ? "/api" : "http://localhost:5000/api";
+
+const normalizeApiBaseUrl = (value) => {
+  if (!value) {
+    return DEFAULT_API_BASE_URL;
+  }
+
+  const trimmedValue = value.trim().replace(/\/+$/, "");
+
+  if (trimmedValue === "/api" || trimmedValue.endsWith("/api")) {
+    return trimmedValue;
+  }
+
+  if (trimmedValue.startsWith("http://") || trimmedValue.startsWith("https://")) {
+    return `${trimmedValue}/api`;
+  }
+
+  return trimmedValue;
+};
+
+const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 
 export const fetchTour = async (slug) => {
   const response = await fetch(`${API_BASE_URL}/tours/${slug}`);

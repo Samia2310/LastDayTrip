@@ -80,6 +80,8 @@ Required environment variable on Vercel:
 VITE_API_BASE_URL=https://your-api-name.onrender.com/api
 ```
 
+You can also set it to `https://your-api-name.onrender.com`. The frontend now normalizes that value to `/api` automatically.
+
 The frontend already supports this pattern in [client/src/lib/api.js](./client/src/lib/api.js).
 
 The SPA rewrite for Vercel is already in [client/vercel.json](./client/vercel.json).
