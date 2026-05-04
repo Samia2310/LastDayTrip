@@ -40,6 +40,14 @@ Set `CLIENT_URL` to your final Vercel frontend URL, for example:
 https://your-app.vercel.app
 ```
 
+Do not add a trailing slash to `CLIENT_URL`.
+
+If you need more than one allowed frontend origin, you can use a comma-separated value, for example:
+
+```text
+https://your-app.vercel.app,https://your-preview.vercel.app
+```
+
 After deploy, your backend URL will look like:
 
 ```text

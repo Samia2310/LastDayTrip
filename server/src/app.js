@@ -8,12 +8,32 @@ import inquiryRoutes from "./routes/inquiryRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const DEFAULT_CLIENT_ORIGIN = "http://localhost:5173";
+
+const normalizeOrigin = (value) => value?.trim().replace(/\/+$/, "");
+
+const allowedOrigins = (process.env.CLIENT_URL || DEFAULT_CLIENT_ORIGIN)
+  .split(",")
+  .map(normalizeOrigin)
+  .filter(Boolean);
 
 export const app = express();
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173"
+    origin(origin, callback) {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      const normalizedOrigin = normalizeOrigin(origin);
+
+      if (allowedOrigins.includes(normalizedOrigin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`CORS origin not allowed: ${origin}`));
+    }
   })
 );
 app.use(express.json());
@@ -43,4 +63,3 @@ app.get("*", (req, res, next) => {
     }
   });
 });
-
