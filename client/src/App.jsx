@@ -298,14 +298,18 @@ function App() {
     const loadTour = async () => {
       try {
         const response = await fetchTour(TOUR_SLUG);
+        const bookingPanel = response.content?.bookingPanel;
         setTour(response);
-        setBookingForm((current) => ({
-          ...current,
-          packageType: response.content.bookingPanel.packageTypes[0],
-          tourType: response.content.bookingPanel.tourTypes[0],
-          travelMonth: response.content.bookingPanel.months[0],
-          travelers: response.content.bookingPanel.travelers[0]
-        }));
+
+        if (bookingPanel) {
+          setBookingForm((current) => ({
+            ...current,
+            packageType: bookingPanel.packageTypes?.[0] || current.packageType,
+            tourType: bookingPanel.tourTypes?.[0] || current.tourType,
+            travelMonth: bookingPanel.months?.[0] || current.travelMonth,
+            travelers: bookingPanel.travelers?.[0] || current.travelers
+          }));
+        }
       } catch (loadError) {
         setError(loadError.message);
       } finally {
