@@ -2,7 +2,7 @@
 
 ## Recommended setup
 
-For this repo, the cleanest free deployment is:
+This repo is now set up for this deployment split:
 
 - Frontend on Vercel
 - Backend on Render
@@ -16,7 +16,7 @@ This works well because the frontend is already a Vite app and the backend is a 
 - Render still offers a free Node web service, but it spins down after 15 minutes of inactivity.
 - MongoDB Atlas Free still gives you one free cluster per project and is a common choice for MERN demos.
 
-## Option 1: Frontend on Vercel, backend on Render
+## Frontend on Vercel, backend on Render
 
 ### 1. Deploy the backend to Render
 
@@ -66,8 +66,13 @@ Use these settings:
 
 - Root Directory: `client`
 - Framework Preset: `Vite`
+- Install Command: `npm install`
 - Build Command: `npm run build`
 - Output Directory: `dist`
+
+Do not use `client/dist` as the output directory.
+
+Do not use the repository root as the Vercel project root for this setup.
 
 Required environment variable on Vercel:
 
@@ -79,26 +84,10 @@ The frontend already supports this pattern in [client/src/lib/api.js](./client/s
 
 The SPA rewrite for Vercel is already in [client/vercel.json](./client/vercel.json).
 
-## Option 2: Deploy the whole project on Vercel
-
-This repo also has a Vercel serverless adapter in [api/[...path].js](./api/%5B...path%5D.js), so full deployment on Vercel is possible for a hobby demo.
-
-Use this only if your API traffic is light and you are okay with serverless behavior:
-
-- cold starts
-- MongoDB connection reuse concerns
-- request duration limits
-
-For this option:
-
-- Deploy the repo root to Vercel
-- Keep the root [vercel.json](./vercel.json)
-- Add `MONGODB_URI` in Vercel environment variables
-
-In this mode, the frontend can keep using same-origin `/api` requests in production.
-
 ## Important note
 
 I removed an unnecessary `file:..` dependency from both `client/package.json` and `server/package.json`.
 
 That dependency often breaks deployments on platforms that isolate a subdirectory build root.
+
+I also removed the repository root `vercel.json` so Vercel will not force repo-level install/build settings onto the frontend deployment.
