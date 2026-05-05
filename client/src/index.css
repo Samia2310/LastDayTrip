@@ -1509,6 +1509,10 @@ a {
   box-shadow: 0 8px 18px rgba(15, 53, 120, 0.16);
 }
 
+.contact-form {
+  margin-top: 14px;
+}
+
 .sidebar-form {
   display: grid;
   gap: 10px;

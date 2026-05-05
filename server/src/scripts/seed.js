@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import { connectDatabase } from "../config/db.js";
-import { Tour } from "../models/Tour.js";
+import { Tour } from "../model/Tour.js";
 import { barishalTour } from "../data/barishalTour.js";
 
 dotenv.config();

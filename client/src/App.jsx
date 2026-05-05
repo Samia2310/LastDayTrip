@@ -41,7 +41,7 @@ import {
   UtensilsCrossed,
   X
 } from "lucide-react";
-import { fetchTour, createBooking } from "./lib/api.js";
+import { fetchTour, createBooking, createInquiry } from "./lib/api.js";
 import { ImageAsset } from "./components/ImageAsset.jsx";
 import { Accordion } from "./components/Accordion.jsx";
 
@@ -440,6 +440,8 @@ function App() {
   const [showAllDates, setShowAllDates] = useState(false);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [bookingStatus, setBookingStatus] = useState("");
+  const [showInquiryForm, setShowInquiryForm] = useState(false);
+  const [inquiryStatus, setInquiryStatus] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileBookingOpen, setIsMobileBookingOpen] = useState(false);
   const [bookingForm, setBookingForm] = useState({
@@ -450,6 +452,11 @@ function App() {
     guestName: "",
     email: "",
     notes: ""
+  });
+  const [inquiryForm, setInquiryForm] = useState({
+    name: "",
+    email: "",
+    message: ""
   });
   const galleryRef = useRef(null);
 
@@ -583,6 +590,26 @@ function App() {
       }));
     } catch (submitError) {
       setBookingStatus(submitError.message);
+    }
+  };
+
+  const handleInquirySubmit = async (event) => {
+    event.preventDefault();
+    setInquiryStatus("Sending your enquiry...");
+
+    try {
+      await createInquiry({
+        tourSlug: tour.slug,
+        ...inquiryForm
+      });
+      setInquiryStatus("Inquiry submitted successfully.");
+      setInquiryForm({
+        name: "",
+        email: "",
+        message: ""
+      });
+    } catch (submitError) {
+      setInquiryStatus(submitError.message);
     }
   };
 
@@ -1130,9 +1157,45 @@ function App() {
                 <button
                   type="button"
                   className="contact-operator-button"
+                  onClick={() => setShowInquiryForm((current) => !current)}
                 >
-                  Contact Operator
+                  {showInquiryForm ? "Hide Inquiry Form" : "Contact Operator"}
                 </button>
+
+                {showInquiryForm ? (
+                  <form className="sidebar-form contact-form" onSubmit={handleInquirySubmit}>
+                    <input
+                      type="text"
+                      placeholder="Your name"
+                      value={inquiryForm.name}
+                      onChange={(event) =>
+                        setInquiryForm((current) => ({ ...current, name: event.target.value }))
+                      }
+                      required
+                    />
+                    <input
+                      type="email"
+                      placeholder="Your email"
+                      value={inquiryForm.email}
+                      onChange={(event) =>
+                        setInquiryForm((current) => ({ ...current, email: event.target.value }))
+                      }
+                      required
+                    />
+                    <textarea
+                      placeholder="Tell us what you would like to know"
+                      value={inquiryForm.message}
+                      onChange={(event) =>
+                        setInquiryForm((current) => ({ ...current, message: event.target.value }))
+                      }
+                      required
+                    />
+                    <button type="submit" className="secondary-submit">
+                      Send Inquiry
+                    </button>
+                    {inquiryStatus ? <p className="form-status">{inquiryStatus}</p> : null}
+                  </form>
+                ) : null}
               </div>
               </section>
 
